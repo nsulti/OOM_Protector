@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <fstream>
+#include <vector>
 // reference: vmrss = actual ram
 
 #if defined(_WIN32) || defined(__CYGWIN__)
@@ -120,10 +121,67 @@ extern "C" EXPORT_API int POSIXVersion(char* arguments[], double allowed_percent
 #include <windows.h>
 #include <psapi.h> 
 
-extern C EXPORT_API int WindowsVersion() {
+extern "C" EXPORT_API int WindowsVersion(char* arguments[], double allowed_percentage) {
+  STARTUPINFOW start_info;
+  PROCESS_INFORMATION proc_info;
+  int ret_code = -1;
+  ZeroMemory(&start_info, sizeof(start_info));
+  start_info.cb = sizeof(start_info);
+  ZeroMemory(&proc_info, sizeof(proc_info));
+  std::string combined_args = "";
+  int i = 0;
+  while (arguments[i] != nullptr) {
+    std::string arg = arguments[i];
 
-  std::cout << "WindowsVersion detected!\n";
-  return 0;
+    if (arg.find(' ') != std::string::npos) {
+      combined_args += "\"" + arg + "\"";
+    } else {
+      combined_args += arg;
+    }
+    i++;
+    if (arguments[i] != nullptr) {
+      combined_args += " ";
+    }
+  }
+  int required_size = MultiByteToWideChar(CP_ACP, 0, combined_args.c_str(), -1, NULL, 0);
+  std::vector<wchar_t> cmd_buffer(required_size);
+  MultiByteToWideChar(CP_ACP, 0, combined_args.c_str(), -1, cmd_buffer.data(), required_size);
+
+  if (!CreateProcessW(
+        NULL,
+        cmd_buffer.data(),
+        NULL,
+        NULL,
+        FALSE,
+        0,
+        NULL,
+        NULL,
+        &start_info,
+        &proc_info
+      )) {
+    std::cerr << "Process didn't start! Reason: " << GetLastError() << "." << std::endl;
+    return 1;
+  }
+  while (true) {
+    DWORD waiting = WaitForSingleObject(proc_info.hProcess, 100);
+    if (waiting == WAIT_OBJECT_0) {
+      std::cout << "No memory leak caught. :)" << std::endl;
+      ret_code = 0;
+      break;
+    }
+    PROCESS_MEMORY_COUNTERS pmc;
+    if (GetProcessMemoryInfo(proc_info.hProcess, &pmc, sizeof(pmc))) {
+      if (pmc.WorkingSetSize / 1024 > allowed_percentage) {
+        TerminateProcess(proc_info.hProcess, 1);
+        ret_code = 2;
+        break;
+      }
+    }
+  }
+  if (ret_code == -1) { ret_code = 0; }
+  CloseHandle(proc_info.hProcess);
+  CloseHandle(proc_info.hThread);
+  return ret_code;
 }
 
 

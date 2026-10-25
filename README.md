@@ -15,7 +15,7 @@ Required:
 
 That's pretty much it. 🤷
 
-.dll and .so come pre-compiled so you could use it out-of-box.
+.dll and .so come pre-compiled so you can use it (almost) out-of-box, only the Python libraries are required.
 
 ```bash
   $ git clone ...
