@@ -160,6 +160,8 @@ extern "C" EXPORT_API int WindowsVersion(char* arguments[], double allowed_perce
         &proc_info
       )) {
     std::cerr << "Process didn't start! Reason: " << GetLastError() << "." << std::endl;
+    CloseHandle(proc_info.hProcess);
+    CloseHandle(proc_info.hThread);
     return 1;
   }
   while (true) {
@@ -171,11 +173,16 @@ extern "C" EXPORT_API int WindowsVersion(char* arguments[], double allowed_perce
     }
     PROCESS_MEMORY_COUNTERS pmc;
     if (GetProcessMemoryInfo(proc_info.hProcess, &pmc, sizeof(pmc))) {
-      if (pmc.WorkingSetSize / 1024 > allowed_percentage) {
+      double total_ram_kb = mem.ullTotalPhys / 1024.0;
+      double mem_used = ((double) pmc.WorkingSetSize / 1024.0) / total_ram_kb * 100.0;
+      if (mem_used > allowed_percentage) {
         TerminateProcess(proc_info.hProcess, 1);
         ret_code = 2;
         break;
       }
+      std::cout << "[MEM_USAGE]: " << pmc.WorkingSetSize / 1024.0 << " kB out of " << total_ram_kb << " kB ("
+        << mem_used << "% / " << allowed_percentage << "%)" << std::endl;
+      std::cout.flush();
     }
   }
   if (ret_code == -1) { ret_code = 0; }
