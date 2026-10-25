@@ -31,7 +31,7 @@ That's pretty much it. 🤷
   $ git clone ...
   $ cd OOM_Protector
   $ python -m venv .venv
-  $ .venv\bin\activate
+  $ .venv\Scripts\activate
   $ pip install -r requirements.txt
   $ python OOM_Protector.py
 ```

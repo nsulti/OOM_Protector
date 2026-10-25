@@ -280,7 +280,10 @@ class MainWindow(ctk.CTk):
                 fg_color = "gray25"
             )
 
-            c_args = self.string_to_cstring(self.file_path + " " + additional_args)
+            masked_path = self.file_path.replace(" ", "\u200B")
+            c_args = self.string_to_cstring(masked_path + " " + additional_args)
+            for idx in range(len(self.b_strings)):
+                self.b_strings[idx] = self.b_strings[idx].replace(b"\xe2\x80\x8b", b" ")
             boxes = self.checkbox_frame.find_active()
             if "Show output stream" in boxes:
                self.add_output = True 
@@ -361,7 +364,7 @@ class MainWindow(ctk.CTk):
             else:
                 os.system(f'killall -9 "{child}"')
             self.status_label.configure(text="Done!", fg_color="gray25")
-            self.execute_button.configure(state="enabled", fg_color="#1dda00")
+            self.execute_button.configure(state="normal", fg_color="#1dda00")
         except Exception as FUCK:
             self.status_label.configure(text="oh no", fg_color="red")
             self.add_line_to_stream(f"[ERROR]: Failed to close the processes. Code: {FUCK}")
