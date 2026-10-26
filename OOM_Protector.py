@@ -282,8 +282,6 @@ class MainWindow(ctk.CTk):
 
             masked_path = self.file_path.replace(" ", "\u200B")
             c_args = self.string_to_cstring(masked_path + " " + additional_args)
-            for idx in range(len(self.b_strings)):
-                self.b_strings[idx] = self.b_strings[idx].replace(b"\xe2\x80\x8b", b" ")
             boxes = self.checkbox_frame.find_active()
             if "Show output stream" in boxes:
                self.add_output = True 
@@ -293,7 +291,7 @@ class MainWindow(ctk.CTk):
     
     def string_to_cstring(self, executable): # harder than expected :/
         split_string = executable.split()
-        self.b_strings = [s.encode('utf-8') for s in split_string]
+        self.b_strings = [s.replace("\u200B", " ").encode('utf-8') for s in split_string]
         self.c_strings = [ctypes.c_char_p(b) for b in self.b_strings] + [None] # get the c strings and null term the array
         self.argv_type = ctypes.c_char_p * len(self.c_strings) # get their size
         c_argv = self.argv_type(*self.c_strings) # return the made c strings
@@ -343,7 +341,7 @@ class MainWindow(ctk.CTk):
             self.chart.show_data(line=self.line_limit, data=data_limit)
             self.chart.show_data(line=self.line, data=self.data)
             if not self.cpp_thread.is_alive():
-                self.execute_button.configure(state="normal", fg_color="#1dda00")
+                self.execute_button.configure(state="disabled", fg_color="gray25")
                 self.kill_button.configure(state="disabled", fg_color="gray25", hover_color="gray25")
                 return
             self.after(100, update_chart)

@@ -203,12 +203,13 @@ extern "C" EXPORT_API int WindowsVersion(char* arguments[], double allowed_perce
       return 1;
   }
   std::string exec = arguments[0];
-  //std::wstring work_dir;
-  // separator = exec.find_last_of("/\\");
-  //if (separator != std::string::npos) {
-  //    size_t length = (separator == 2 && exec.size() > 1 && exec[1] == ':') ? separator + 1 : separator;
-  //    work_dir = Utf8ToWide(exec.substr(0, length));
-  //}
+  std::wstring work_dir;
+  separator = exec.find_last_of("/\\");
+  if (separator != std::string::npos) {
+    size_t dir_len = separator;
+    if (dir_len == 2 && exec.size() > 1 && exec[1] == ':') dir_len = 3;
+    work_dir = Utf8ToWide(exec.substr(0, length));
+  }
 
   HANDLE pipe_read = nullptr;
   HANDLE pipe_write = nullptr;
@@ -231,7 +232,7 @@ extern "C" EXPORT_API int WindowsVersion(char* arguments[], double allowed_perce
 
   STARTUPINFOW start_info{};
   start_info.cb = sizeof(start_info);
-  start_info.dwFlags = SsTARTF_USESTDHANDLES;
+  start_info.dwFlags = STARTF_USESTDHANDLES;
   start_info.hStdInput = null_input;
   start_info.hStdOutput = pipe_write;
   start_info.hStdError = pipe_write;
@@ -241,8 +242,7 @@ extern "C" EXPORT_API int WindowsVersion(char* arguments[], double allowed_perce
   cmd_buffer.push_back(L'\0');
   BOOL started = CreateProcessW(
       app_name.c_str(), cmd_buffer.data(), nullptr, nullptr, TRUE, 0, nullptr,
-      nullptr, &start_info, &proc_info);// work_dir.empty() ? nullptr : work_dir.c_str()
-
+      work_dir.empty() ? nullptr : work_dir.c_str(), &start_info, &proc_info);// 
   DWORD launch_error = started ? ERROR_SUCCESS : GetLastError();
   CloseHandle(null_input);
   CloseHandle(pipe_write); // child owns this
