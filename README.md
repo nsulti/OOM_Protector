@@ -26,7 +26,7 @@ That's pretty much it. 🤷
   $ pip install -r requirements.txt
   $ python OOM_Protector.py
 ```
-# Windows
+# Windows !!(currently WIP, does not work as intended)!!
 ```cmd
   $ git clone ...
   $ cd OOM_Protector
