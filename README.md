@@ -6,11 +6,11 @@ This project demonstrates low-level inter-process communication (IPC), cross-lan
 
 ## ⭐Features⭐
 
-- Selectable RAM usage before your executable is killed.
-- A graph to show the change of RAM usage.
-- An option to show what the program pipes back.
-- Add additional arguments to the program.
-- Cross-platform GUI and syscalls (WindowsAPI / POSIX).
+1. Selectable RAM usage before your executable is killed.
+2. A graph to show the change of RAM usage.
+3. An option to show what the program pipes back.
+4. Add additional arguments to the program.
+5. Cross-platform GUI and syscalls (WindowsAPI / POSIX).
 
 ## 🛠️Installation🛠️
 
@@ -50,7 +50,7 @@ That's pretty much it. 🤷
 
 ## 🚧 Known Issues & Future Roadmap (Windows Target)
 
-The Linux implementation is fully stable, while the Windows core is currently in an experimental phase with several planned improvements.
+‼️ The Linux implementation is fully stable, while the Windows core is currently in an experimental phase with several planned improvements.
 
 ## 🌋 License
 
