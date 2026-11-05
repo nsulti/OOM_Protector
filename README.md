@@ -1,6 +1,8 @@
 # 🛡️Out-of-memory Protector🛡️
 
-A small project made in a day, utilizing system calls + piping C++ std::cout straight into Python. And a bit of CustomTKinter. Launches your executable under C++ monitoring it's RAM usage. When goes overboard - instant kill.
+A cross-platform GUI utility designed to monitor the RAM usage of an executable in real-time and instantly terminate it if it goes overboard. Built utilizing system calls and piping C++ std::cout straight into Python. 
+
+This project demonstrates low-level inter-process communication (IPC), cross-language binding via `ctypes`, and OS-specific memory management.
 
 ## ⭐Features⭐
 
@@ -8,6 +10,8 @@ A small project made in a day, utilizing system calls + piping C++ std::cout str
 - A graph to show the change of RAM usage.
 - An option to show what the program pipes back.
 - Add additional arguments to the program.
+- Cross-platform GUI and syscalls (WindowsAPI / POSIX).
+
 ## 🛠️Installation🛠️
 
 Required:
@@ -36,3 +40,18 @@ That's pretty much it. 🤷
   $ python OOM_Protector.py
 ```
 
+
+## 🛠️ Architecture & Tech Stack
+
+- Backend (Core): C++17, POSIX API (unistd.h, sys/sysinfo.h), Windows API (windows.h, psapi.h).
+- Frontend (GUI): Python 3, customtkinter, ctkchart.
+- Glue Layer: ctypes for loading native dynamic libraries and structural arguments passing.
+
+
+## 🚧 Known Issues & Future Roadmap (Windows Target)
+
+The Linux implementation is fully stable, while the Windows core is currently in an experimental phase with several planned improvements.
+
+## 🌋 License
+
+This project is licensed under the GNU GPLv3 — feel free to analyze, modify, and distribute the code!
